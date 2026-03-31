@@ -48,7 +48,7 @@ const LoginScreen = ({ onLogin, onSwitchToRegister }) => {
   return (
     <div className="w-full flex justify-center items-center">
       <div className="w-full max-w-sm bg-slate-800/30 border border-slate-700 rounded-2xl p-8 backdrop-blur-lg">
-        <h2 className="text-center text-2xl font-bold mb-6 text-slate-100">Login to DealForge</h2>
+        <h2 className="text-center text-2xl font-bold mb-6 text-slate-100">Login</h2>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="flex flex-col gap-2">
             <label htmlFor="email" className="text-sm font-medium text-slate-300">Email</label>
