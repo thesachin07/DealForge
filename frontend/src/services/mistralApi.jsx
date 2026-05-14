@@ -26,7 +26,7 @@ Respond naturally as ARIA. Keep it punchy and real.`;
 
 export async function callMistral(messages) {
   try {
-    const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const apiBaseUrl = import.meta.env.VITE_API_URL;
     const response = await fetch(`${apiBaseUrl}/api/negotiate`, {
       method: "POST",
       headers: {
