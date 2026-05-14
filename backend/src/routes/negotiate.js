@@ -12,15 +12,20 @@ router.post("/", negotiateLimiter, async (req, res) => {
       return res.status(400).json({ error: "Invalid messages format" });
     }
 
+    const apiKey = process.env.MISTRAL_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: "MISTRAL_API_KEY missing in server environment" });
+    }
+
     // Forward to Mistral API
     const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`,
+        "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "mistral-large-latest",
+model: "mistral-small-latest",
         max_tokens: 300,
         messages,
       }),
@@ -34,7 +39,8 @@ router.post("/", negotiateLimiter, async (req, res) => {
 
     res.json(data);
   } catch (error) {
-    res.status(500).json({ error: "Failed to process negotiation" });
+    console.error("Negotiate route error:", error);
+    res.status(500).json({ error: "Failed to process negotiation", details: error.message });
   }
 });
 

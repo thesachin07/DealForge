@@ -41,7 +41,9 @@ export async function callMistral(messages) {
     });
 
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.status}`);
+      const errorData = await response.json().catch(() => null);
+      const errorMessage = errorData?.error || `API request failed: ${response.status}`;
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
