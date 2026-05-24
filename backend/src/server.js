@@ -15,7 +15,7 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:3000",
-    "https://dealforge-rho.vercel.app"
+    "https://dealforgein.vercel.app"
   ],
   credentials: true
 }));
