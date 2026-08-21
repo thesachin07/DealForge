@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ChatArea from "./components/ChatArea";
 import ProductCard from "./components/ProductCard";
 import TacticsBar from "./components/TacticsBar";
