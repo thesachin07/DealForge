@@ -348,7 +348,6 @@ const location = useLocation();
 
   return (
     <Routes>
-      {/* Public home */}
       <Route
         path="/"
         element={renderPublicLayout(
@@ -356,7 +355,7 @@ const location = useLocation();
         )}
       />
 
-      {/* Public negotiation introduction */}
+    
       <Route
         path="/negotiate"
         element={renderPublicLayout(
@@ -364,7 +363,6 @@ const location = useLocation();
         )}
       />
 
-      {/* Public leaderboard */}
       <Route
         path="/leaderboard"
         element={renderPublicLayout(
@@ -375,7 +373,6 @@ const location = useLocation();
         )}
       />
 
-      {/* Login */}
       <Route
         path="/login"
         element={
@@ -403,7 +400,6 @@ const location = useLocation();
         }
       />
 
-      {/* Register */}
       <Route
         path="/register"
         element={renderPublicLayout(
@@ -418,7 +414,6 @@ const location = useLocation();
         )}
       />
 
-      {/* Protected AI negotiation */}
       <Route
         path="/negotiate/play"
         element={
@@ -436,7 +431,6 @@ const location = useLocation();
         }
       />
 
-      {/* Fallback */}
       <Route
         path="*"
         element={
