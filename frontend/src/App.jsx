@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Routes, Route, useNavigate, useLocation  } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate, useLocation  } from "react-router-dom";
 
 import ChatArea from "./components/ChatArea";
 import ProductCard from "./components/ProductCard";
@@ -199,146 +199,250 @@ const location = useLocation();
   const rank = dealPrice ? getRank(dealPrice) : null;
 
   // Show authentication screens if not logged in
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-6 relative overflow-hidden">
-        <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] rounded-full bg-gradient-to-r from-brand-500/10 to-transparent pointer-events-none"></div>
-        <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] rounded-full bg-gradient-to-l from-emerald-500/10 to-transparent pointer-events-none"></div>
-        
-        <div className="text-center mb-10">
-          <h1 className="text-5xl font-black tracking-tight mb-2">
-            DEAL<span className="text-brand-500">FORGE</span>
-          </h1>
-          <p className="text-lg text-slate-400">AI Negotiation Arena</p>
-        </div>
-        {authPhase === "login" ? (
-          <LoginScreen
-            onLogin={handleLogin}
-            onSwitchToRegister={() => setAuthPhase("register")}
-          />
-        ) : (
-          <RegisterScreen
-            onRegister={handleRegister}
-            onSwitchToLogin={() => setAuthPhase("login")}
-          />
-        )}
+  const handleStartNegotiation = () => {
+    if (!user) {
+      navigate("/login", {
+        state: {
+          from: "/negotiate/play",
+        },
+      });
+      return;
+    }
+
+    navigate("/negotiate/play");
+  };
+
+  const renderPublicLayout = (children) => (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center p-6 relative overflow-hidden">
+      <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] rounded-full bg-gradient-to-r from-brand-500/10 to-transparent pointer-events-none"></div>
+
+      <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] rounded-full bg-gradient-to-l from-emerald-500/10 to-transparent pointer-events-none"></div>
+
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-black tracking-tight">
+          DEAL<span className="text-brand-500">FORGE</span>
+        </h1>
+
+        <p className="text-sm text-slate-400">
+          Beat the Seller, Win the Deal
+        </p>
       </div>
-    );
-  }
+
+      {children}
+    </div>
+  );
+
+  const renderGameLayout = (children) => (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center p-6 relative overflow-hidden">
+      <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] rounded-full bg-gradient-to-r from-brand-500/10 to-transparent pointer-events-none"></div>
+
+      <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] rounded-full bg-gradient-to-l from-emerald-500/10 to-transparent pointer-events-none"></div>
+
+      <div className="absolute top-6 right-6 flex items-center gap-4">
+        <span className="text-sm text-slate-400">
+          Welcome, {user?.username}!
+        </span>
+
+        <button
+          onClick={handleLogout}
+          className="px-3 py-1.5 bg-red-500/10 border border-red-500/20 rounded text-xs text-red-300 hover:bg-red-500/20 transition"
+        >
+          Logout
+        </button>
+      </div>
+
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-black tracking-tight">
+          DEAL<span className="text-brand-500">FORGE</span>
+        </h1>
+
+        <p className="text-sm text-slate-400">
+          Beat the Seller, Win the Deal
+        </p>
+      </div>
+
+      {children}
+    </div>
+  );
+
+  const renderGame = () => (
+    <>
+      {phase === "playing" && (
+        <div className="w-full max-w-2xl flex flex-col gap-4">
+          <ProductCard currentPrice={currentPrice} />
+
+          <div className="flex gap-2 font-mono text-xs">
+            <div className="px-2 py-1 rounded text-slate-400 bg-white/5 border border-white/10">
+              ROUND{" "}
+              <span className="text-slate-100">
+                {roundCount}/8
+              </span>
+            </div>
+
+            <div className="px-2 py-1 rounded text-slate-400 bg-white/5 border border-white/10">
+              SAVED{" "}
+              <span className="text-emerald-400">
+                ${PRODUCT.listPrice - currentPrice}
+              </span>
+            </div>
+
+            <div className="px-2 py-1 rounded text-slate-400 bg-white/5 border border-white/10">
+              DISCOUNT{" "}
+              <span className="text-emerald-400">
+                {Math.round(
+                  ((PRODUCT.listPrice - currentPrice) /
+                    PRODUCT.listPrice) *
+                    100
+                )}
+                %
+              </span>
+            </div>
+          </div>
+
+          <ChatArea
+            messages={messages}
+            isTyping={isTyping}
+          />
+
+          <TacticsBar onTacticClick={applyTactic} />
+
+          <div className="flex gap-2 items-end">
+            <textarea
+              ref={inputRef}
+              className="flex-1 bg-slate-800/50 border border-slate-600 rounded-lg p-3 text-slate-100 font-sans resize-none outline-none focus:border-brand-500 placeholder-slate-600 min-h-[48px] max-h-[120px]"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKey}
+              placeholder="Make your offer or argue your case..."
+              rows={2}
+              disabled={isTyping}
+            />
+
+            <button
+              className="px-5 py-3 bg-brand-500 hover:bg-brand-600 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-semibold rounded-lg whitespace-nowrap transition h-[48px]"
+              onClick={sendMessage}
+              disabled={isTyping || !input.trim()}
+            >
+              SEND
+            </button>
+          </div>
+        </div>
+      )}
+
+      {phase === "done" && dealPrice !== null && rank && (
+        <DealScreen
+          dealPrice={dealPrice}
+          roundCount={roundCount}
+          onPlayAgain={() => {
+            setPhase("start");
+            navigate("/negotiate");
+          }}
+          onViewLeaderboard={() => {
+            loadLeaderboard().then(setLeaderboard);
+            navigate("/leaderboard");
+          }}
+        />
+      )}
+    </>
+  );
 
   return (
-    <>
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center p-6 relative overflow-hidden">
-        <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] rounded-full bg-gradient-to-r from-brand-500/10 to-transparent pointer-events-none"></div>
-        <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] rounded-full bg-gradient-to-l from-emerald-500/10 to-transparent pointer-events-none"></div>
-        
-        {/* Logout button at top-right corner */}
-        <div className="absolute top-6 right-6 flex items-center gap-4">
-          <span className="text-sm text-slate-400">Welcome, {user.username}!</span>
-          <button onClick={handleLogout} className="px-3 py-1.5 bg-red-500/10 border border-red-500/20 rounded text-xs text-red-300 hover:bg-red-500/20 transition">
-            Logout
-          </button>
-        </div>
-        
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-black tracking-tight">
-            DEAL<span className="text-brand-500">FORGE</span>
-          </h1>
-          <p className="text-sm text-slate-400">Beat the Seller, Win the Deal</p>
-        </div>
+    <Routes>
+      {/* Public home */}
+      <Route
+        path="/"
+        element={renderPublicLayout(
+          <StartScreen onStart={handleStartNegotiation} />
+        )}
+      />
 
-        <div className="flex gap-1 bg-white/5 border border-white/10 rounded-lg p-1 mb-6">
-          <button
-            className={`flex-1 px-5 py-2 text-sm font-semibold transition rounded ${
-              tab === "game"
-                ? "bg-brand-500/20 text-brand-200 border border-brand-500/30"
-                : "text-slate-500 hover:text-slate-300"
-            }`}
-            onClick={() => setTab("game")}
-          >
-             Negotiate
-          </button>
-          <button
-            className={`flex-1 px-5 py-2 text-sm font-semibold transition rounded ${
-              tab === "board"
-                ? "bg-brand-500/20 text-brand-200 border border-brand-500/30"
-                : "text-slate-500 hover:text-slate-300"
-            }`}
-            onClick={() => {
-              setTab("board");
-              loadLeaderboard().then(setLeaderboard);
-            }}
-          >
-             Leaderboard
-          </button>
-        </div>
+      {/* Public negotiation introduction */}
+      <Route
+        path="/negotiate"
+        element={renderPublicLayout(
+          <StartScreen onStart={handleStartNegotiation} />
+        )}
+      />
 
-        {tab === "game" && (
-          <>
-            {phase === "start" && <StartScreen onStart={startGame} />}
+      {/* Public leaderboard */}
+      <Route
+        path="/leaderboard"
+        element={renderPublicLayout(
+          <Leaderboard
+            leaderboard={leaderboard}
+            myEntryId={myEntryId}
+          />
+        )}
+      />
 
-            {phase === "playing" && (
-              <div className="w-full max-w-2xl flex flex-col gap-4">
-                <ProductCard currentPrice={currentPrice} />
-
-                <div className="flex gap-2 font-mono text-xs">
-                  <div className="px-2 py-1 rounded text-slate-400 bg-white/5 border border-white/10">
-                    ROUND <span className="text-slate-100">{roundCount}/8</span>
-                  </div>
-                  <div className="px-2 py-1 rounded text-slate-400 bg-white/5 border border-white/10">
-                    SAVED <span className="text-emerald-400">${PRODUCT.listPrice - currentPrice}</span>
-                  </div>
-                  <div className="px-2 py-1 rounded text-slate-400 bg-white/5 border border-white/10">
-                    DISCOUNT <span className="text-emerald-400">
-                      {Math.round(((PRODUCT.listPrice - currentPrice) / PRODUCT.listPrice) * 100)}%
-                    </span>
-                  </div>
-                </div>
-
-                <ChatArea messages={messages} isTyping={isTyping} />
-
-                <TacticsBar onTacticClick={applyTactic} />
-
-                <div className="flex gap-2 items-end">
-                  <textarea
-                    ref={inputRef}
-                    className="flex-1 bg-slate-800/50 border border-slate-600 rounded-lg p-3 text-slate-100 font-sans resize-none outline-none focus:border-brand-500 placeholder-slate-600 min-h-[48px] max-h-[120px]"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKey}
-                    placeholder="Make your offer or argue your case..."
-                    rows={2}
-                    disabled={isTyping}
-                  />
-                  <button
-                    className="px-5 py-3 bg-brand-500 hover:bg-brand-600 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-semibold rounded-lg whitespace-nowrap transition h-[48px]"
-                    onClick={sendMessage}
-                    disabled={isTyping || !input.trim()}
-                  >
-                    SEND
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {phase === "done" && dealPrice !== null && rank && (
-              <DealScreen
-                dealPrice={dealPrice}
-                roundCount={roundCount}
-                onPlayAgain={() => setPhase("start")}
-                onViewLeaderboard={() => {
-                  setTab("board");
-                  loadLeaderboard().then(setLeaderboard);
-                }}
+      {/* Login */}
+      <Route
+        path="/login"
+        element={
+          renderPublicLayout(
+            authPhase === "login" ? (
+              <LoginScreen
+                onLogin={handleLogin}
+                onSwitchToRegister={() =>
+                  navigate("/register", {
+                    state: location.state,
+                  })
+                }
               />
-            )}
-          </>
-        )}
+            ) : (
+              <RegisterScreen
+                onRegister={handleRegister}
+                onSwitchToLogin={() =>
+                  navigate("/login", {
+                    state: location.state,
+                  })
+                }
+              />
+            )
+          )
+        }
+      />
 
-        {tab === "board" && (
-          <Leaderboard leaderboard={leaderboard} myEntryId={myEntryId} />
+      {/* Register */}
+      <Route
+        path="/register"
+        element={renderPublicLayout(
+          <RegisterScreen
+            onRegister={handleRegister}
+            onSwitchToLogin={() =>
+              navigate("/login", {
+                state: location.state,
+              })
+            }
+          />
         )}
-      </div>
-    </>
+      />
+
+      {/* Protected AI negotiation */}
+      <Route
+        path="/negotiate/play"
+        element={
+          <ProtectedRoute>
+            {renderGameLayout(
+              <>
+                {phase === "start" && (
+                  <StartScreen onStart={startGame} />
+                )}
+
+                {renderGame()}
+              </>
+            )}
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Fallback */}
+      <Route
+        path="*"
+        element={
+          <Navigate to="/" replace />
+        }
+      />
+    </Routes>
   );
 }
