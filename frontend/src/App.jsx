@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation  } from "react-router-dom";
+
 import ChatArea from "./components/ChatArea";
 import ProductCard from "./components/ProductCard";
 import TacticsBar from "./components/TacticsBar";
@@ -8,6 +9,8 @@ import Leaderboard from "./components/Leaderboard";
 import StartScreen from "./components/StartScreen";
 import LoginScreen from "./components/LoginScreen";
 import RegisterScreen from "./components/RegisterScreen";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 import { PRODUCT } from "./constants/product.js";
 import { getRank } from "./constants/ranks.js";
 import { callMistral } from "./services/mistralApi.jsx";
@@ -16,6 +19,8 @@ import { parseDeal, cleanMessage, extractPrice } from "./utils/negotiation.js";
 
 export default function App() {
   const [tab, setTab] = useState("game");
+  const navigate = useNavigate();
+const location = useLocation();
   const [phase, setPhase] = useState("start"); // start | playing | done
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -43,15 +48,23 @@ export default function App() {
   }, []);
 
   // Authentication functions
-  const handleLogin = (userData) => {
-    setUser(userData);
-    setPlayerName(userData.username);
-  };
+ const handleLogin = (userData) => {
+  setUser(userData);
+  setPlayerName(userData.username);
 
-  const handleRegister = (userData) => {
-    setUser(userData);
-    setPlayerName(userData.username);
-  };
+  const destination = location.state?.from || "/negotiate/play";
+
+  navigate(destination, { replace: true });
+};
+
+ const handleRegister = (userData) => {
+  setUser(userData);
+  setPlayerName(userData.username);
+
+  const destination = location.state?.from || "/negotiate/play";
+
+  navigate(destination, { replace: true });
+};
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -60,6 +73,7 @@ export default function App() {
     setPhase("start");
     setMessages([]);
     setPlayerName("");
+    navigate("/");
   };
 
   const startGame = async () => {
