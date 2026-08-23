@@ -18,7 +18,7 @@ import { loadLeaderboard, saveToLeaderboard } from "./services/leaderboard.js";
 import { parseDeal, cleanMessage, extractPrice } from "./utils/negotiation.js";
 
 export default function App() {
-  const [tab, setTab] = useState("game");
+
   const navigate = useNavigate();
 const location = useLocation();
   const [phase, setPhase] = useState("start"); // start | playing | done
@@ -212,25 +212,49 @@ const location = useLocation();
     navigate("/negotiate/play");
   };
 
-  const renderPublicLayout = (children) => (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center p-6 relative overflow-hidden">
-      <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] rounded-full bg-gradient-to-r from-brand-500/10 to-transparent pointer-events-none"></div>
+ const renderPublicLayout = (children) => (
+  <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center p-6 relative overflow-hidden">
+    <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] rounded-full bg-gradient-to-r from-brand-500/10 to-transparent pointer-events-none"></div>
 
-      <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] rounded-full bg-gradient-to-l from-emerald-500/10 to-transparent pointer-events-none"></div>
+    <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] rounded-full bg-gradient-to-l from-emerald-500/10 to-transparent pointer-events-none"></div>
 
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-black tracking-tight">
-          DEAL<span className="text-brand-500">FORGE</span>
-        </h1>
+    <div className="text-center mb-8">
+      <h1 className="text-4xl font-black tracking-tight">
+        DEAL<span className="text-brand-500">FORGE</span>
+      </h1>
 
-        <p className="text-sm text-slate-400">
-          Beat the Seller, Win the Deal
-        </p>
-      </div>
-
-      {children}
+      <p className="text-sm text-slate-400">
+        Beat the Seller, Win the Deal
+      </p>
     </div>
-  );
+
+    <nav className="flex gap-1 bg-white/5 border border-white/10 rounded-lg p-1 mb-6">
+      <button
+        onClick={() => navigate("/negotiate")}
+        className={`px-5 py-2 text-sm font-semibold transition rounded ${
+          location.pathname === "/negotiate" || location.pathname === "/"
+            ? "bg-brand-500/20 text-brand-200 border border-brand-500/30"
+            : "text-slate-500 hover:text-slate-300"
+        }`}
+      >
+        Negotiate
+      </button>
+
+      <button
+        onClick={() => navigate("/leaderboard")}
+        className={`px-5 py-2 text-sm font-semibold transition rounded ${
+          location.pathname === "/leaderboard"
+            ? "bg-brand-500/20 text-brand-200 border border-brand-500/30"
+            : "text-slate-500 hover:text-slate-300"
+        }`}
+      >
+        Leaderboard
+      </button>
+    </nav>
+
+    {children}
+  </div>
+);
 
   const renderGameLayout = (children) => (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center p-6 relative overflow-hidden">
